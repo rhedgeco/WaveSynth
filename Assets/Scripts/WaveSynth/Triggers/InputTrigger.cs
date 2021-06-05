@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using WaveSynth.FrequencyHandlers;
 
-namespace WaveSynth
+namespace WaveSynth.Triggers
 {
-    public class MidiTrigger : MonoBehaviour
+    public class InputTrigger : AudioTrigger
     {
+        [SerializeField] private InputAction action;
         [SerializeField] private List<KeyboardNote> keys = new List<KeyboardNote>();
-
-        public List<float> Frequencies => _pressed ? _frequencies : _empty;
 
         private bool _pressed;
         private List<float> _empty = new List<float>();
@@ -20,11 +20,15 @@ namespace WaveSynth
             {
                 _frequencies.Add(FrequencyTable.GetEqualTemperedFrequency(key.key, key.octave));
             }
+            
+            action.performed += context => _pressed = true;
+            action.canceled += context => _pressed = false;
+            action.Enable();
         }
 
-        private void Update()
+        public override List<float> GetActiveFrequencies()
         {
-            _pressed = Input.GetKey(KeyCode.Space);
+            return _pressed ? _frequencies : _empty;
         }
     }
 }
