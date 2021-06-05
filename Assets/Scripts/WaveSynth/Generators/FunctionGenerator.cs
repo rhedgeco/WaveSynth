@@ -1,10 +1,12 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using WaveSynth.Triggers;
 
 namespace WaveSynth.Generators
 {
     public abstract class FunctionGenerator : AudioOutput
     {
-        [SerializeField] private MidiTrigger trigger;
+        [SerializeField] private AudioTrigger trigger;
 
         private long _timeIndex;
 
@@ -16,22 +18,23 @@ namespace WaveSynth.Generators
             }
 
             if (!trigger) return;
-            if (trigger.Frequencies == null) return;
-            if (trigger.Frequencies.Count == 0) _timeIndex = 0;
-            else _timeIndex += buffer.Length;
+            List<float> frequencies = trigger.GetActiveFrequencies();
+            if (frequencies.Count == 0) _timeIndex = 0;
+            else _timeIndex += GlobalAudioController.BufferSize;
         }
 
         private float FunctionSample(long timeIndex)
         {
             if (!trigger) return 0;
-            if (trigger.Frequencies == null) return 0;
+            List<float> frequencies = trigger.GetActiveFrequencies();
 
-            int midiCount = trigger.Frequencies.Count;
+            int midiCount = frequencies.Count;
             float amplitude = 1f / midiCount;
             
-            float sample = 0, loop;
-            foreach (float frequency in trigger.Frequencies)
+            float sample = 0, loop, frequency;
+            for(int i = 0; i < midiCount; i++)
             {
+                frequency = frequencies[i];
                 loop = timeIndex % (GlobalAudioController.SampleRate / frequency);
                 sample += WaveFunction(loop * frequency / GlobalAudioController.SampleRate) * amplitude;
             }

@@ -7,7 +7,7 @@ namespace WaveSynth
     public class GlobalAudioController : MonoBehaviour
     {
         public static float SampleRate { get; private set; } = 44100;
-        public static int BufferSize => _bufferSize;
+        public static int BufferSize { get; private set; } = 1024;
         public static int AccessID { get; private set; }
 
         private static int _bufferSize = 1024;
@@ -21,7 +21,8 @@ namespace WaveSynth
         private void Awake()
         {
             AudioSettings.GetDSPBufferSize(out _bufferSize, out _numBuffers);
-            _bufferSize *= 2; // multiply the bufferSize by 2 stereo channels
+            _bufferSize *= 2;
+            print($"Buffer Size {_bufferSize}");
             SampleRate = sampleRate;
             AccessID = 0;
 

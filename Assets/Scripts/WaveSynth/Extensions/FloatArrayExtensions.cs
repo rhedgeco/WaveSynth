@@ -6,7 +6,7 @@ namespace WaveSynth.Extensions
     {
         public static void AddList(this float[] a, float[] array)
         {
-            int cap = Math.Max(a.Length, array.Length);
+            int cap = Math.Min(a.Length, array.Length);
             for (int i = 0; i < cap; i++)
             {
                 a[i] += array[i];
