@@ -11,14 +11,15 @@ namespace WaveSynth.Triggers
         [SerializeField] private List<KeyboardNote> keys = new List<KeyboardNote>();
 
         private bool _pressed;
-        private List<float> _empty = new List<float>();
-        private List<float> _frequencies = new List<float>();
+        private List<TriggerFrequency> _empty = new List<TriggerFrequency>();
+        private List<TriggerFrequency> _frequencies = new List<TriggerFrequency>();
 
         private void Awake()
         {
             foreach (KeyboardNote key in keys)
             {
-                _frequencies.Add(FrequencyTable.GetEqualTemperedFrequency(key.key, key.octave));
+                float freq = FrequencyTable.GetEqualTemperedFrequency(key.key, key.octave);
+                _frequencies.Add(new TriggerFrequency(freq, 1));
             }
             
             action.performed += context => _pressed = true;
@@ -26,7 +27,7 @@ namespace WaveSynth.Triggers
             action.Enable();
         }
 
-        protected override List<float> ProcessFrequencies()
+        protected override List<TriggerFrequency> ProcessFrequencies()
         {
             return _pressed ? _frequencies : _empty;
         }
