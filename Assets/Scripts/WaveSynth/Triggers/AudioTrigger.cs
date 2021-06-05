@@ -5,6 +5,19 @@ namespace WaveSynth.Triggers
 {
     public abstract class AudioTrigger : MonoBehaviour
     {
-        public abstract List<float> GetActiveFrequencies();
+        private int _lastAccessID = -1;
+        private List<float> _frequencyCache = new List<float>();
+
+        public List<float> GetActiveFrequencies()
+        {
+            if (GlobalAudioController.AccessID == _lastAccessID) 
+                return _frequencyCache;
+            _lastAccessID = GlobalAudioController.AccessID;
+
+            _frequencyCache = ProcessFrequencies();
+            return _frequencyCache;
+        }
+
+        protected abstract List<float> ProcessFrequencies();
     }
 }

@@ -26,7 +26,7 @@ namespace WaveSynth.Triggers
             action.Enable();
         }
 
-        public override List<float> GetActiveFrequencies()
+        protected override List<float> ProcessFrequencies()
         {
             return _pressed ? _frequencies : _empty;
         }

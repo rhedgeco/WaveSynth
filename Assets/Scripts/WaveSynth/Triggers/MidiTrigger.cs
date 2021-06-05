@@ -23,7 +23,7 @@ namespace WaveSynth.Triggers
             midi.onWillNoteOff += control => _notes.Remove(new NoteInfo(control.noteNumber));
         }
 
-        public override List<float> GetActiveFrequencies()
+        protected override List<float> ProcessFrequencies()
         {
             _frequencies.Clear();
 
