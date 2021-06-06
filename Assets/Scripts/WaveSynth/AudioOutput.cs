@@ -17,7 +17,8 @@ namespace WaveSynth
             if (GlobalAudioController.AccessID == _lastAccessID) 
                 return _cachedBuffer;
             _lastAccessID = GlobalAudioController.AccessID;
-            
+
+            for (int i = 0; i < _cachedBuffer.Length; i++) _cachedBuffer[i] = 0;
             ProcessBuffer(ref _cachedBuffer);
             return _cachedBuffer;
         }

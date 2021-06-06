@@ -1,14 +1,16 @@
 ﻿using System.Collections.Generic;
 using Minis;
-using UnityEngine;
 
 namespace WaveSynth.Triggers
 {
     public class MidiTrigger : AudioTrigger
     {
-        private List<NoteInfo> _notes = new List<NoteInfo>();
         private HashSet<MidiDevice> _devices = new HashSet<MidiDevice>();
         private List<TriggerFrequency> _frequencies = new List<TriggerFrequency>();
+        private object _notesLock = new object();
+
+        private Dictionary<KeyboardTrigger, TriggerFrequency> _notes =
+            new Dictionary<KeyboardTrigger, TriggerFrequency>();
 
         private void Update()
         {
@@ -17,25 +19,50 @@ namespace WaveSynth.Triggers
             if (_devices.Contains(midi)) return;
             _devices.Add(midi);
 
-            midi.onWillNoteOn += (control, f) => _notes.Add(new NoteInfo(control.noteNumber));
-            midi.onWillNoteOff += control => _notes.Remove(new NoteInfo(control.noteNumber));
+            midi.onWillNoteOn += (control, f) =>
+            {
+                lock (_notesLock)
+                {
+                    KeyboardTrigger key = new KeyboardTrigger(midi, control.noteNumber);
+                    if (_notes.ContainsKey(key)) _notes.Remove(key);
+                    TriggerFrequency freq = new TriggerFrequency(control.noteNumber, f);
+                    _notes.Add(key, freq);
+                }
+            };
+
+            midi.onWillNoteOff += control =>
+            {
+                lock (_notesLock)
+                {
+                    KeyboardTrigger key = new KeyboardTrigger(midi, control.noteNumber);
+                    _notes.Remove(key);
+                }
+            };
         }
 
-        protected override List<TriggerFrequency> ProcessFrequencies()
+        protected override List<TriggerFrequency> ProcessFrequencies(int bufferLength)
         {
-            // TODO: Process midi notes
+            _frequencies.Clear();
+            lock (_notesLock)
+            {
+                foreach (TriggerFrequency frequency in _notes.Values)
+                {
+                    _frequencies.Add(frequency);
+                }
+            }
+
             return _frequencies;
         }
 
-        private struct NoteInfo
+        private struct KeyboardTrigger
         {
-            public int HalfStep { get; }
-            public uint Octave { get; }
+            public MidiDevice Device { get; }
+            public int NoteNumber { get; }
 
-            public NoteInfo(int noteNumber)
+            public KeyboardTrigger(MidiDevice device, int noteNumber)
             {
-                HalfStep = Mathf.Clamp(noteNumber - 12, 0, 88) % 12;
-                Octave = (uint) (noteNumber / 12);
+                Device = device;
+                NoteNumber = noteNumber;
             }
         }
     }
