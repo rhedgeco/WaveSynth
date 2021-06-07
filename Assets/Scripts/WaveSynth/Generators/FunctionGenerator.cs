@@ -47,31 +47,37 @@ namespace WaveSynth.Generators
                 _envelopes.Add(new EnvelopeData(frequency, (float) _random.NextDouble() - 0.5f));
             }
 
-            for (int i = 0; i < buffer.Length; i++)
+            for (int i = 0; i < buffer.Length; i += 2)
             {
-                buffer[i] = FunctionSample();
+                StereoSample sample = FunctionSample();
+                buffer[i + 0] = sample.left;
+                buffer[i + 1] = sample.right;
             }
         }
 
-        private float FunctionSample()
+        private StereoSample FunctionSample()
         {
             int midiCount = _envelopes.Count;
 
-            float sample = 0;
+            StereoSample sample = new StereoSample();
             for (int i = 0; i < midiCount; i++)
             {
                 EnvelopeData envelope = _envelopes[i];
                 float freqValue = envelope.Trigger.Frequency;
-                
+
                 // apply phasing to progress
                 float progress = envelope.BufferProgress % (GlobalAudioController.SampleRate / freqValue);
                 progress *= freqValue / GlobalAudioController.SampleRate;
                 progress += phase;
                 progress += envelope.RandomPhase * randomPhase;
                 progress %= 1;
-                
+
                 float wavePart = WaveFunction(progress);
-                sample += wavePart * envelope.Amplitude * amplitude;
+                wavePart *= envelope.Amplitude * amplitude;
+
+                float pan = envelope.Trigger.Panning;
+                sample.left += wavePart * Mathf.Clamp(-pan + 1, 0, 1);
+                sample.right += wavePart * Mathf.Clamp(pan + 1, 0, 1);
 
                 // apply attack and release
                 if (envelope.Active && envelope.Amplitude < 1) envelope.ModifyAmplitude(1 / _attackSpeed);
@@ -83,6 +89,12 @@ namespace WaveSynth.Generators
         }
 
         protected abstract float WaveFunction(float value);
+
+        private struct StereoSample
+        {
+            public float left;
+            public float right;
+        }
 
         private class EnvelopeData
         {
