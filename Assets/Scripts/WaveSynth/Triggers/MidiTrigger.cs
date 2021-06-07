@@ -8,6 +8,7 @@ namespace WaveSynth.Triggers
         private HashSet<MidiDevice> _devices = new HashSet<MidiDevice>();
         private List<TriggerFrequency> _frequencies = new List<TriggerFrequency>();
         private object _notesLock = new object();
+        private bool _notesChanged = false;
 
         private Dictionary<KeyboardTrigger, TriggerFrequency> _notes =
             new Dictionary<KeyboardTrigger, TriggerFrequency>();
@@ -27,6 +28,7 @@ namespace WaveSynth.Triggers
                     if (_notes.ContainsKey(key)) _notes.Remove(key);
                     TriggerFrequency freq = new TriggerFrequency(control.noteNumber, f);
                     _notes.Add(key, freq);
+                    _notesChanged = true;
                 }
             };
 
@@ -36,12 +38,14 @@ namespace WaveSynth.Triggers
                 {
                     KeyboardTrigger key = new KeyboardTrigger(midi, control.noteNumber);
                     _notes.Remove(key);
+                    _notesChanged = true;
                 }
             };
         }
 
         protected override List<TriggerFrequency> ProcessFrequencies(int bufferLength)
         {
+            if (!_notesChanged) return _frequencies;
             _frequencies.Clear();
             lock (_notesLock)
             {
@@ -49,6 +53,8 @@ namespace WaveSynth.Triggers
                 {
                     _frequencies.Add(frequency);
                 }
+
+                _notesChanged = false;
             }
 
             return _frequencies;
