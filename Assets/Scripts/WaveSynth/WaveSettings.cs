@@ -36,7 +36,7 @@ namespace WaveSynth
         private void OnAudioFilterRead(float[] data, int channels)
         {
             foreach (WaveSpeaker producer in _outputs)
-                data.AddList(producer.ProcessChain(data.Length));
+                data.AddList(producer.ProcessChain());
             AccessID += 1; // switch access ID so generators can reset cache
         }
 

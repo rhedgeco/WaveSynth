@@ -7,10 +7,10 @@ namespace WaveSynth
     {
         [SerializeField] private WaveOutput source;
 
-        public float[] ProcessChain(int bufferSize)
+        public float[] ProcessChain()
         {
             if (!source) return null;
-            return source.GetWaveBuffer(bufferSize);
+            return source.GetWaveBuffer(GetHashCode());
         }
         
         private void Start() => WaveSettings.AttachProducer(this);
