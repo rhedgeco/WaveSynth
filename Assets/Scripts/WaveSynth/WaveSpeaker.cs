@@ -10,10 +10,10 @@ namespace WaveSynth
         public float[] ProcessChain()
         {
             if (!source) return null;
-            return source.GetWaveBuffer(GetHashCode());
+            return source.GetWaveBuffer();
         }
         
-        private void Start() => WaveSettings.AttachProducer(this);
-        private void OnDestroy() => WaveSettings.DetachProducer(this);
+        private void Start() => WaveSettings.AttachSpeaker(this);
+        private void OnDestroy() => WaveSettings.DetachSpeaker(this);
     }
 }

@@ -163,10 +163,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 544478863}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a4d6549e9a104f16b7567f931a1cb92b, type: 3}
+  m_Script: {fileID: 11500000, guid: 4439849c8897460c94d8831e9a32f641, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocityFloor: 1
+  frequency: 440
+  action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: ddf761f9-2dea-4eb7-b554-9cebb2867d6e
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 7c114d26-28d6-4a75-b6e1-b2d8a8ff48ea
+      m_Path: <Keyboard>/space
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
 --- !u!1 &648134347
 GameObject:
   m_ObjectHideFlags: 0
@@ -210,7 +226,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e59ae560e344db383978f0a6e759653, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trigger: {fileID: 544478865}
+  triggerRoot: {fileID: 544478865}
   amplitude: 0.3
 --- !u!1 &705507993
 GameObject:

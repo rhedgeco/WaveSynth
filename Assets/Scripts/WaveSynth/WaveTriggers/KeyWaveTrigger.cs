@@ -1,43 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace WaveSynth.WaveTriggers
 {
-    public class KeyWaveTrigger : WaveTrigger
+    public class KeyWaveTrigger : WaveTriggerRoot
     {
         [SerializeField] private float frequency = 440;
-        [SerializeField] private InputAction _action;
+        [SerializeField] private InputAction action;
 
-        private bool _changed;
         private bool _playing;
-        private HashSet<Trigger> _triggerCache = new HashSet<Trigger>();
+        private int _timeProgress;
 
         private void Awake()
         {
-            _action.started += context =>
-            {
-                print("start");
-                _playing = true;
-                _changed = true;
-            };
-            _action.canceled += context =>
-            {
-                print("stop");
-                _playing = false;
-                _changed = true;
-            };
-            _action.Enable();
+            _playing = false;
+            _timeProgress = 0;
+            
+            action.started += context => _playing = true;
+            action.canceled += context => _playing = false;
+            action.Enable();
         }
 
-        public override HashSet<Trigger> GetTriggers(int bufferLength)
+        protected override void ProcessTriggerBuffer(ref TriggerRange[] triggers)
         {
-            if (!_changed) return _triggerCache;
-            _triggerCache.Clear();
-            if (_playing) _triggerCache.Add(new Trigger(frequency, 1));
-            _changed = false;
-            return _triggerCache;
+            for (int i = 0; i < triggers.Length; i++)
+            {
+                TriggerRange range = triggers[i];
+                if (!_playing)
+                {
+                    range.ActiveLength = 0;
+                    _timeProgress = 0;
+                    continue;
+                }
+
+                range.ActiveLength = 1;
+                range.Triggers[0].Frequency = frequency;
+                range.Triggers[0].Amplitude = 1;
+                range.Triggers[0].SampleProgress = _timeProgress++;
+            }
         }
     }
 }

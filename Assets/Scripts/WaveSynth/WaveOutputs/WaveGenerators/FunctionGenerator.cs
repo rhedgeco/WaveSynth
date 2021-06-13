@@ -1,34 +1,37 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using WaveSynth.WaveTriggers;
 
 namespace WaveSynth.WaveOutputs.WaveGenerators
 {
-    public abstract class FunctionGenerator : WaveOutput
+    public abstract class FunctionGenerator : WaveRoot
     {
-        [SerializeField] private WaveTrigger trigger;
+        [SerializeField] private WaveTriggerOutput triggerRoot;
         [SerializeField] [Range(0, 1)] private float amplitude = 0.8f;
-
-        private Dictionary<WaveTrigger.Trigger, int> _bufferProgress =
-            new Dictionary<WaveTrigger.Trigger, int>();
 
         protected override void ProcessWaveBuffer(ref float[] buffer)
         {
-            for (int i = 0; i < buffer.Length; i += 2)
+            WaveTriggerOutput.TriggerRange[] sampleTriggers = triggerRoot.GetTriggers();
+            for (int sampleIndex = 0; sampleIndex < buffer.Length; sampleIndex += 2)
             {
-                buffer[i + 0] = buffer[i + 1] = 0;
-                HashSet<WaveTrigger.Trigger> triggers = trigger.GetTriggers(1);
-                foreach (WaveTrigger.Trigger frequencyTrigger in triggers)
+                float sample = 0;
+                WaveTriggerOutput.TriggerRange triggers = sampleTriggers[sampleIndex / 2];
+                if (triggers.ActiveLength == 0)
                 {
-                    if (!_bufferProgress.ContainsKey(frequencyTrigger))
-                        _bufferProgress.Add(frequencyTrigger, 0);
-                    int progress = _bufferProgress[frequencyTrigger]++;
-                    float phase = progress % (WaveSettings.SampleRate / frequencyTrigger.Frequency);
-                    phase *= frequencyTrigger.Frequency / WaveSettings.SampleRate;
-                    float sample = SampleFunction(phase % 1) * amplitude * frequencyTrigger.Amplitude;
-                    buffer[i + 0] += sample;
-                    buffer[i + 1] += sample;
+                    buffer[sampleIndex] = buffer[sampleIndex + 1] = sample;
+                    continue;
                 }
+
+                WaveTriggerOutput.Trigger trigger;
+                for (int triggerIndex = 0; triggerIndex < triggers.ActiveLength; triggerIndex++)
+                {
+                    trigger = triggers.Triggers[triggerIndex];
+                    int progress = triggers.Triggers[triggerIndex].SampleProgress;
+                    float phase = progress % (WaveSettings.SampleRate / trigger.Frequency);
+                    phase *= trigger.Frequency / WaveSettings.SampleRate;
+                    sample += SampleFunction(phase % 1) * trigger.Amplitude * amplitude;
+                }
+
+                buffer[sampleIndex] = buffer[sampleIndex + 1] = sample;
             }
         }
 
