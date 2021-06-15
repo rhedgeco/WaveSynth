@@ -4,21 +4,18 @@ namespace WaveSynth.WaveTriggers
 {
     public abstract class WaveTriggerOutput : MonoBehaviour
     {
-        private const int MaxTriggerCount = 512;
-        
-        public abstract TriggerRange[] GetTriggers();
-        
-        public class TriggerRange
-        {
-            public int ActiveLength = 0;
-            public Trigger[] Triggers { get; } = new Trigger[MaxTriggerCount];
-        }
+        public abstract WaveTriggerIndexer GetSampleTriggers();
 
-        public struct Trigger
+        public class Trigger
         {
-            public int SampleProgress;
             public float Frequency;
             public float Amplitude;
+
+            public Trigger(float frequency, float amplitude)
+            {
+                Frequency = frequency;
+                Amplitude = amplitude;
+            }
         }
     }
 }
