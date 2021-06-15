@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Profiling;
 using WaveSynth.WaveTriggers;
 
 namespace WaveSynth.WaveOutputs.WaveGenerators
@@ -7,6 +6,7 @@ namespace WaveSynth.WaveOutputs.WaveGenerators
     public abstract class FunctionGenerator : WaveRoot
     {
         [SerializeField] private WaveTriggerOutput triggerOutput;
+        [SerializeField] private bool output = true;
         [SerializeField] [Range(0, 1)] private float amplitude = 0.8f;
 
         private TriggerHolder[] _triggers = new TriggerHolder[WaveSettings.MaxTriggerCount];
@@ -21,14 +21,14 @@ namespace WaveSynth.WaveOutputs.WaveGenerators
         {
             for (int sampleIndex = 0; sampleIndex < buffer.Length; sampleIndex += 2)
             {
-                float sample = 0;
                 WaveTriggerIndexer indexer = triggerOutput.GetSampleTriggers();
-                if (indexer.Count == 0)
+                if (indexer.Count == 0 || !output)
                 {
-                    buffer[sampleIndex] = buffer[sampleIndex + 1] = sample;
+                    buffer[sampleIndex] = buffer[sampleIndex + 1] = 0;
                     continue;
                 }
                 
+                float sample = 0;
                 for (int i = 0; i < indexer.Count; i++)
                 {
                     int rawIndex = indexer.GetRawIndex(i);
@@ -36,17 +36,17 @@ namespace WaveSynth.WaveOutputs.WaveGenerators
                     WaveTriggerOutput.Trigger trigger = indexer.GetTrigger(rawIndex);
                     float triggerFrequency = trigger.Frequency;
                     float triggerAmplitude = trigger.Amplitude;
-                    
-                    if (holder.Trigger == trigger)
-                    {
-                        holder.Phase += triggerFrequency / WaveSettings.SampleRate;
-                    }
-                    else
+
+                    if (holder.Trigger == null || holder.Trigger.UniqueId != trigger.UniqueId)
                     {
                         holder.Trigger = trigger;
                         holder.Phase = 0;
                     }
-                    
+                    else
+                    {
+                        holder.Phase += triggerFrequency / WaveSettings.SampleRate;
+                    }
+
                     sample += SampleFunction(holder.Phase) * triggerAmplitude * amplitude;
                 }
                 
@@ -54,14 +54,14 @@ namespace WaveSynth.WaveOutputs.WaveGenerators
             }
         }
 
-        protected abstract float SampleFunction(float phase);
+        protected abstract float SampleFunction(double phase);
 
         private class TriggerHolder
         {
             public WaveTriggerOutput.Trigger Trigger;
-            public float Phase;
+            public double Phase;
 
-            public void Set(WaveTriggerOutput.Trigger trigger, float phase)
+            public void Set(WaveTriggerOutput.Trigger trigger, double phase)
             {
                 Trigger = trigger;
                 Phase = phase;

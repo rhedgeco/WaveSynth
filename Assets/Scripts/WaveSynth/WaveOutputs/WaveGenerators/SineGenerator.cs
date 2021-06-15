@@ -1,12 +1,13 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace WaveSynth.WaveOutputs.WaveGenerators
 {
     public class SineGenerator : FunctionGenerator
     {
-        protected override float SampleFunction(float phase)
+        protected override float SampleFunction(double phase)
         {
-            return Mathf.Sin(phase * 2 * Mathf.PI);
+            return (float) Math.Sin(phase * 2 * Mathf.PI);
         }
     }
 }

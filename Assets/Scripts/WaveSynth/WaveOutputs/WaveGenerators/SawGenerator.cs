@@ -2,9 +2,9 @@
 {
     public class SawGenerator : FunctionGenerator
     {
-        protected override float SampleFunction(float phase)
+        protected override float SampleFunction(double phase)
         {
-            return -1 + phase * 2;
+            return (float) (-1 + phase * 2);
         }
     }
 }
