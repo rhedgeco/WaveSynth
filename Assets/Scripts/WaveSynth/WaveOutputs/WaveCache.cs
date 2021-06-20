@@ -1,6 +1,6 @@
 ﻿namespace WaveSynth.WaveOutputs
 {
-    public abstract class WaveRoot : WaveOutput
+    public abstract class WaveCache : WaveOutput
     {
         private int _lastAccess = -1;
         private float[] _waveCache = new float[0];

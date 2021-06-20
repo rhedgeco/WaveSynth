@@ -1,71 +1,66 @@
-﻿using UnityEngine;
-using WaveSynth.WaveTriggers;
+﻿using System;
+using UnityEngine;
+using WaveSynth.FrequencyHandlers;
+using WaveSynth.WaveMidi;
 
 namespace WaveSynth.WaveOutputs.WaveGenerators
 {
-    public abstract class FunctionGenerator : WaveRoot
+    public abstract class FunctionGenerator : WaveCache
     {
-        [SerializeField] private WaveTriggerOutput triggerOutput;
+        [SerializeField] private WaveMidiOutput midiOutput;
         [SerializeField] private bool output = true;
         [SerializeField] [Range(0, 1)] private float amplitude = 0.8f;
+        [SerializeField] [Range(0, 1)] private float phaseOffset = 0.5f;
+        [SerializeField] [Range(0, 0.5f)] private float randomPhase = 0.5f;
 
-        private TriggerHolder[] _triggers = new TriggerHolder[WaveSettings.MaxTriggerCount];
-
-        private void Awake()
-        {
-            for (int i = 0; i < _triggers.Length; i++)
-                _triggers[i] = new TriggerHolder();
-        }
+        private System.Random _random = new System.Random();
+        private WaveState[] _waveStates = new WaveState[MidiState.MidiKeyCount];
 
         protected override void ProcessWaveBuffer(ref float[] buffer)
         {
+            MidiState[] states = midiOutput.GetMidiBuffer();
             for (int sampleIndex = 0; sampleIndex < buffer.Length; sampleIndex += 2)
             {
-                WaveTriggerIndexer indexer = triggerOutput.GetSampleTriggers();
-                if (indexer.Count == 0 || !output)
-                {
-                    buffer[sampleIndex] = buffer[sampleIndex + 1] = 0;
-                    continue;
-                }
+                MidiState state = states[sampleIndex / 2];
+                MidiState.Key[] keys = state.Keys;
                 
                 float sample = 0;
-                for (int i = 0; i < indexer.Count; i++)
+                for (int i = 0; i < keys.Length && output; i++)
                 {
-                    int rawIndex = indexer.GetRawIndex(i);
-                    TriggerHolder holder = _triggers[rawIndex];
-                    WaveTriggerOutput.Trigger trigger = indexer.GetTrigger(rawIndex);
-                    float triggerFrequency = trigger.Frequency;
-                    float triggerAmplitude = trigger.Amplitude;
+                    if (!keys[i].Active) continue;
+                    
+                    int halfStep = i % 12;
+                    uint octave = (uint) (i / 12);
+                    float keyFrequency = FrequencyTable.GetEqualTemperedFrequency(halfStep, octave);
+                    float keyAmplitude = keys[i].Amplitude;
 
-                    if (holder.Trigger == null || holder.Trigger.UniqueId != trigger.UniqueId)
+                    if (keys[i].SampleTime == 0)
                     {
-                        holder.Trigger = trigger;
-                        holder.Phase = 0;
+                        _waveStates[i].PhaseOffset = CreatePhase();
+                        _waveStates[i].SampleRef = 0;
                     }
-                    else
-                    {
-                        holder.Phase += triggerFrequency / WaveSettings.SampleRate;
-                    }
-
-                    sample += SampleFunction(holder.Phase) * triggerAmplitude * amplitude;
+                    
+                    int sampleProgress = keys[i].SampleTime - _waveStates[i].SampleRef;
+                    double phase = (keyFrequency / WaveSettings.SampleRate) * sampleProgress;
+                    sample += SampleFunction(phase % 1) * keyAmplitude * amplitude;
                 }
                 
                 buffer[sampleIndex] = buffer[sampleIndex + 1] = sample;
             }
         }
 
-        protected abstract float SampleFunction(double phase);
-
-        private class TriggerHolder
+        private double CreatePhase()
         {
-            public WaveTriggerOutput.Trigger Trigger;
-            public double Phase;
+            double phase = phaseOffset + _random.NextDouble() * randomPhase;
+            return phase % 1;
+        }
 
-            public void Set(WaveTriggerOutput.Trigger trigger, double phase)
-            {
-                Trigger = trigger;
-                Phase = phase;
-            }
+        protected abstract float SampleFunction(double phase);
+        
+        private struct WaveState
+        {
+            public int SampleRef;
+            public double PhaseOffset;
         }
     }
 }

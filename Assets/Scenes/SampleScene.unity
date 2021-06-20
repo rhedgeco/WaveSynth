@@ -123,52 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &333248022
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 333248023}
-  - component: {fileID: 333248024}
-  m_Layer: 0
-  m_Name: EnvelopeFilter
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &333248023
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 333248022}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1288045081}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &333248024
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 333248022}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2293519c6e544b3bb716de07c513bdaf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  triggerOutput: {fileID: 544478865}
-  attackMs: 2
-  releaseMs: 15
 --- !u!1 &544478863
 GameObject:
   m_ObjectHideFlags: 0
@@ -198,7 +152,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1288045081}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &544478865
 MonoBehaviour:
@@ -209,7 +163,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 544478863}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd8e8e056d4d45d78f2130eebe248771, type: 3}
+  m_Script: {fileID: 11500000, guid: bb0f63e431e043bfbe65b7bf6f11010e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   velocityFloor: 0
@@ -256,9 +210,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e59ae560e344db383978f0a6e759653, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  triggerOutput: {fileID: 333248024}
+  midiOutput: {fileID: 544478865}
   output: 1
   amplitude: 0.3
+  phaseOffset: 0.5
+  randomPhase: 0.5
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -465,7 +421,6 @@ Transform:
   m_Children:
   - {fileID: 1632671135}
   - {fileID: 648134348}
-  - {fileID: 333248023}
   - {fileID: 544478864}
   m_Father: {fileID: 0}
   m_RootOrder: 2
