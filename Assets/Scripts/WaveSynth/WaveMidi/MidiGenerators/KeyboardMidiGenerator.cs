@@ -22,6 +22,7 @@ namespace WaveSynth.WaveMidi.MidiGenerators
             {
                 int noteNumber = control.noteNumber;
                 _keyStates[noteNumber].Active = true;
+                _keyStates[noteNumber].SampleTime = 0;
                 _keyStates[noteNumber].Velocity = Mathf.Lerp(velocityFloor, 1, f);
             };
 
