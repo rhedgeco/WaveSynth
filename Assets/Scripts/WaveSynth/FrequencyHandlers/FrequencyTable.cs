@@ -1,21 +1,38 @@
 ﻿using UnityEngine;
+using WaveSynth.WaveMidi;
 
 namespace WaveSynth.FrequencyHandlers
 {
     public class FrequencyTable
     {
         private const float Root12 = 1.0594630943592952645618252949463f;
-        public static float BaseAFrequency = 27.50f;
+        private static float _baseAFrequency = 27.50f;
+        private static float _a4Frequency = 440;
+        private static float[] _cache = new float[MidiState.MidiKeyCount];
+
+        public static float A4Frequency
+        {
+            get => _a4Frequency;
+            set
+            {
+                _a4Frequency = value;
+                _baseAFrequency = value / 16;
+                for (int i = 0; i < _cache.Length; i++) _cache[i] = 0;
+            }
+        }
 
         public static float GetEqualTemperedFrequency(KeyboardKey key, uint octave)
         {
             int halfSteps = GetHalfStepsFromA(key);
-            return GetEqualTemperedFrequency(halfSteps, octave);
+            long cacheIndex = octave * 12 + halfSteps;
+            if (_cache[cacheIndex] == 0) 
+                _cache[cacheIndex] = GetEqualTemperedFrequency(halfSteps, octave);
+            return _cache[cacheIndex];
         }
         
         public static float GetEqualTemperedFrequency(int halfSteps, uint octave)
         {
-            return BaseAFrequency * Mathf.Pow(2, octave) * Mathf.Pow(Root12, halfSteps - 9);
+            return _baseAFrequency * Mathf.Pow(2, octave) * Mathf.Pow(Root12, halfSteps - 9);
         }
 
         private static int GetHalfStepsFromA(KeyboardKey key)
