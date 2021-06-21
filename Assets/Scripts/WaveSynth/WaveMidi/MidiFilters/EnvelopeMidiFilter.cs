@@ -24,6 +24,7 @@ namespace WaveSynth.WaveMidi.MidiFilters
                     float amplitude = outStateKeys[keyIndex].Amplitude;
                     
                     buffer[stateIndex].Keys[keyIndex].SampleTime = sampleTime;
+                    if (sampleTime == 0) _envelopes[keyIndex] = 0;
 
                     // attack
                     if (active && _envelopes[keyIndex] < 1)
