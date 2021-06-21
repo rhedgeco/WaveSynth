@@ -24,15 +24,15 @@ namespace WaveSynth.FrequencyHandlers
         public static float GetEqualTemperedFrequency(KeyboardKey key, uint octave)
         {
             int halfSteps = GetHalfStepsFromA(key);
-            long cacheIndex = octave * 12 + halfSteps;
-            if (_cache[cacheIndex] == 0) 
-                _cache[cacheIndex] = GetEqualTemperedFrequency(halfSteps, octave);
-            return _cache[cacheIndex];
+            return GetEqualTemperedFrequency(halfSteps, octave);
         }
         
         public static float GetEqualTemperedFrequency(int halfSteps, uint octave)
         {
-            return _baseAFrequency * Mathf.Pow(2, octave) * Mathf.Pow(Root12, halfSteps - 9);
+            long cacheIndex = octave * 12 + halfSteps;
+            if (_cache[cacheIndex] == 0) 
+                _cache[cacheIndex] = _baseAFrequency * Mathf.Pow(2, octave) * Mathf.Pow(Root12, halfSteps - 9);
+            return _cache[cacheIndex];
         }
 
         private static int GetHalfStepsFromA(KeyboardKey key)
