@@ -12,7 +12,6 @@ namespace WaveSynth
         public static int BufferSize => ChannelBufferSize * Channels;
         public static int ChannelBufferSize => GetBufferSize();
         public static int Channels => 2;
-        public const int MaxTriggerCount = 1024;
 
         private static int _sampleRate = -1;
         private static int _bufferSize = -1;
