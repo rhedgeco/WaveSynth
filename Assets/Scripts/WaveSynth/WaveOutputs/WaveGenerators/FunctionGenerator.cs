@@ -7,7 +7,7 @@ namespace WaveSynth.WaveOutputs.WaveGenerators
 {
     public abstract class FunctionGenerator : WaveCache
     {
-        [SerializeField] private WaveMidiOutput midiOutput;
+        [SerializeField] private WaveMidiOutput midiSource;
         [SerializeField] private bool output = true;
         [SerializeField] [Range(0, 1)] private float amplitude = 0.8f;
         [SerializeField] [Range(0, 1)] private float phaseOffset = 0.5f;
@@ -18,7 +18,7 @@ namespace WaveSynth.WaveOutputs.WaveGenerators
 
         protected override void ProcessWaveBuffer(ref float[] buffer)
         {
-            MidiState[] states = midiOutput.GetMidiBuffer();
+            MidiState[] states = midiSource.GetMidiBuffer();
             for (int sampleIndex = 0; sampleIndex < buffer.Length; sampleIndex += 2)
             {
                 MidiState state = states[sampleIndex / 2];

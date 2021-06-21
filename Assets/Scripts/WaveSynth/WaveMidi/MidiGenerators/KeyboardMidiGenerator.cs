@@ -33,7 +33,7 @@ namespace WaveSynth.WaveMidi.MidiGenerators
             };
         }
 
-        protected override void ProcessWaveBuffer(ref MidiState[] buffer)
+        protected override void ProcessMidiBuffer(ref MidiState[] buffer)
         {
             foreach (MidiState state in buffer)
             {

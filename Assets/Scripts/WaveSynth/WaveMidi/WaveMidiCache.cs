@@ -8,7 +8,7 @@
         public override MidiState[] GetMidiBuffer()
         {
             if (ValidateCache()) return _midiCache;
-            ProcessWaveBuffer(ref _midiCache);
+            ProcessMidiBuffer(ref _midiCache);
             return _midiCache;
         }
 
@@ -26,6 +26,6 @@
             for (int i = 0; i < _midiCache.Length; i++) _midiCache[i] = new MidiState();
         }
 
-        protected abstract void ProcessWaveBuffer(ref MidiState[] buffer);
+        protected abstract void ProcessMidiBuffer(ref MidiState[] buffer);
     }
 }
