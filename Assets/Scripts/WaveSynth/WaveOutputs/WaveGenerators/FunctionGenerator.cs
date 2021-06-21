@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using WaveSynth.FrequencyHandlers;
 using WaveSynth.WaveMidi;
 
@@ -7,11 +6,19 @@ namespace WaveSynth.WaveOutputs.WaveGenerators
 {
     public abstract class FunctionGenerator : WaveCache
     {
+        // @formatter:off
         [SerializeField] private WaveMidiOutput midiSource;
-        [SerializeField] private bool output = true;
         [SerializeField] [Range(0, 1)] private float amplitude = 0.8f;
+        
+        [Header("Phase Control")]
         [SerializeField] [Range(0, 1)] private float phaseOffset = 0.5f;
         [SerializeField] [Range(0, 0.5f)] private float randomPhase = 0.5f;
+        
+        [Header("Voices")]
+        [SerializeField] [Range(1, 16)] private int voices = 1;
+        [SerializeField] [Range(0, 1)] private float detune = 1;
+        [SerializeField] private float maxDetune = 12f;
+        // @formatter:on
 
         private System.Random _random = new System.Random();
         private WaveState[] _waveStates = new WaveState[MidiState.MidiKeyCount];
@@ -24,8 +31,9 @@ namespace WaveSynth.WaveOutputs.WaveGenerators
                 MidiState state = states[sampleIndex / 2];
                 MidiState.Key[] keys = state.Keys;
                 
-                float sample = 0;
-                for (int i = 0; i < keys.Length && output; i++)
+                float sampleL = 0;
+                float sampleR = 0;
+                for (int i = 0; i < keys.Length; i++)
                 {
                     if (!keys[i].Active) continue;
                     
@@ -42,10 +50,13 @@ namespace WaveSynth.WaveOutputs.WaveGenerators
                     
                     int sampleProgress = keys[i].SampleTime - _waveStates[i].SampleRef;
                     double phase = (keyFrequency / WaveSettings.SampleRate) * sampleProgress;
-                    sample += SampleFunction(phase % 1) * keyAmplitude * amplitude;
+                    float sample = SampleFunction((phase + _waveStates[i].PhaseOffset) % 1) * keyAmplitude * amplitude;
+                    sampleL += sample;
+                    sampleR += sample;
                 }
                 
-                buffer[sampleIndex] = buffer[sampleIndex + 1] = sample;
+                buffer[sampleIndex + 0] = sampleL;
+                buffer[sampleIndex + 1] = sampleR;
             }
         }
 
@@ -61,6 +72,7 @@ namespace WaveSynth.WaveOutputs.WaveGenerators
         {
             public int SampleRef;
             public double PhaseOffset;
+            public double[] VoicePhases;
         }
     }
 }

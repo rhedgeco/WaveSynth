@@ -207,14 +207,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 648134347}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e59ae560e344db383978f0a6e759653, type: 3}
+  m_Script: {fileID: 11500000, guid: 171265c1e4da411fab127d9a8bca60b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   midiSource: {fileID: 1507416714}
-  output: 1
   amplitude: 0.3
   phaseOffset: 0.5
   randomPhase: 0.5
+  voices: 1
+  detune: 1
+  maxDetune: 12
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
