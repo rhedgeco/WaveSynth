@@ -60,3 +60,11 @@ crashlytics-build.properties
 
 #jet brains folder
 .idea/
+
+#unity nuget explorer
+Assets/NuGet
+Assets/NuGet.meta
+Assets/NuGet.config
+Assets/NuGet.config.meta
+Assets/packages.config
+Assets/packages.config.meta

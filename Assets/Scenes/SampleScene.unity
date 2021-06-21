@@ -484,7 +484,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   midiSource: {fileID: 544478865}
-  attackMs: 2
+  attackMs: 0.5
   releaseMs: 15
 --- !u!114 &1632671138
 MonoBehaviour:
