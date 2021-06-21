@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Profiling;
 using WaveSynth.FrequencyHandlers;
 using WaveSynth.WaveMidi;
 
@@ -25,7 +26,10 @@ namespace WaveSynth.WaveOutputs.WaveGenerators
 
         protected override void ProcessWaveBuffer(ref float[] buffer)
         {
+            Profiler.BeginSample("ProcessWaveBuffer");
+            Profiler.BeginSample("FunctionGetMidi");
             MidiState[] states = midiSource.GetMidiBuffer();
+            Profiler.EndSample();
             for (int sampleIndex = 0; sampleIndex < buffer.Length; sampleIndex += 2)
             {
                 MidiState state = states[sampleIndex / 2];
@@ -39,7 +43,9 @@ namespace WaveSynth.WaveOutputs.WaveGenerators
                     
                     int halfStep = i % 12;
                     uint octave = (uint) (i / 12);
+                    Profiler.BeginSample("GetFrequency");
                     float keyFrequency = FrequencyTable.GetEqualTemperedFrequency(halfStep, octave);
+                    Profiler.EndSample();
                     float keyAmplitude = keys[i].Amplitude;
 
                     if (keys[i].SampleTime == 0)
@@ -50,7 +56,9 @@ namespace WaveSynth.WaveOutputs.WaveGenerators
                     
                     int sampleProgress = keys[i].SampleTime - _waveStates[i].SampleRef;
                     double phase = (keyFrequency / WaveSettings.SampleRate) * sampleProgress;
+                    Profiler.BeginSample("SampleFunction");
                     float sample = SampleFunction((phase + _waveStates[i].PhaseOffset) % 1) * keyAmplitude * amplitude;
+                    Profiler.EndSample();
                     sampleL += sample;
                     sampleR += sample;
                 }
@@ -58,6 +66,7 @@ namespace WaveSynth.WaveOutputs.WaveGenerators
                 buffer[sampleIndex + 0] = sampleL;
                 buffer[sampleIndex + 1] = sampleR;
             }
+            Profiler.EndSample();
         }
 
         private double CreatePhase()
