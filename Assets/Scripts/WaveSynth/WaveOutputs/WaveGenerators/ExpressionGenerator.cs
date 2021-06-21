@@ -6,6 +6,7 @@ namespace WaveSynth.WaveOutputs.WaveGenerators
 {
     public class ExpressionGenerator : FunctionGenerator
     {
+        [Header("Expression")]
         [SerializeField] private string expression = "sin(2 * pi * x)";
         
         private float[] _compiled;
