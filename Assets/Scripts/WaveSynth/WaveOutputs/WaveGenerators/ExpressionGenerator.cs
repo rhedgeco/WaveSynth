@@ -34,7 +34,7 @@ namespace WaveSynth.WaveOutputs.WaveGenerators
             {
                 _argument.setArgumentValue((double) i / _compiled.Length);
                 value = Convert.ToSingle(_expression.calculate());
-                _compiled[i] = value;
+                _compiled[i] = Mathf.Clamp(value, -1, 1);
             }
         }
     }

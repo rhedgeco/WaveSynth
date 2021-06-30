@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using Unity.Collections;
+using UnityEngine;
 
 namespace WaveSynth.WaveOutputs
 {
     public abstract class WaveOutput : MonoBehaviour
     {
-        public abstract float[] GetWaveBuffer();
+        public abstract NativeArray<float> GetWaveBuffer();
     }
 }
