@@ -1,13 +1,11 @@
-﻿using Unity.Collections;
-
-namespace WaveSynth.WaveOutputs
+﻿namespace WaveSynth.WaveOutputs
 {
     public abstract class WaveCache : WaveOutput
     {
         private int _lastAccess = -1;
-        private NativeArray<float> _waveCache = new NativeArray<float>(0, Allocator.Persistent);
+        private float[] _waveCache = new float[0];
 
-        public override NativeArray<float> GetWaveBuffer()
+        public override float[] GetWaveBuffer()
         {
             if (ValidateCache()) return _waveCache;
             ProcessWaveBuffer(ref _waveCache);
@@ -16,16 +14,14 @@ namespace WaveSynth.WaveOutputs
 
         private bool ValidateCache()
         {
-            if (_waveCache.Length != WaveSettings.BufferSize) {
-                _waveCache.Dispose();
-                _waveCache = new NativeArray<float>(WaveSettings.BufferSize, Allocator.Persistent);
-            }
+            if (_waveCache.Length != WaveSettings.BufferSize)
+                _waveCache = new float[WaveSettings.BufferSize];
             
             bool valid = _lastAccess == WaveSettings.AccessID;
             _lastAccess = WaveSettings.AccessID;
             return valid;
         }
 
-        protected abstract void ProcessWaveBuffer(ref NativeArray<float> buffer);
+        protected abstract void ProcessWaveBuffer(ref float[] buffer);
     }
 }
