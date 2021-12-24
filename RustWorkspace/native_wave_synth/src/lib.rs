@@ -1,18 +1,18 @@
 use std::f32::consts::PI;
 
 #[repr(C)]
-pub struct wave_data {
+pub struct WaveData {
     frequency: f32,
     amplitude: f32,
 }
 
 #[repr(C)]
-pub struct array<T> {
+pub struct Array<T> {
     ptr: *mut T,
     length: usize,
 }
 
-impl<T> array<T> {
+impl<T> Array<T> {
 
     // creates a mutable array from the pointer data
     fn get_mutable_array(&mut self) -> &mut [T] {
@@ -26,7 +26,7 @@ impl<T> array<T> {
 }
 
 #[no_mangle]
-pub extern "C" fn merge_audio_buffers(mut main_buffer: array<f32>, add_buffer: array<f32>) {
+pub extern "C" fn merge_audio_buffers(mut main_buffer: Array<f32>, add_buffer: Array<f32>) {
     let buffer = main_buffer.get_mutable_array();
     let add = add_buffer.get_array();
     let combine_length = buffer.len().min(add.len());
@@ -38,8 +38,8 @@ pub extern "C" fn merge_audio_buffers(mut main_buffer: array<f32>, add_buffer: a
 
 #[no_mangle]
 pub extern "C" fn generate_sin_wave(
-    mut buffer_struct: array<f32>,
-    wave_data_struct: array<wave_data>,
+    mut buffer_struct: Array<f32>,
+    wave_data_struct: Array<WaveData>,
     phase_start: f32,
     sample_rate: i32,
 ) -> f32 {
