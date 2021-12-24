@@ -1,52 +1,9 @@
-use std::os::raw::c_char;
-use std::ffi::{CString};
+mod structs;
+
 use std::f32::consts::PI;
-
-#[repr(C)]
-pub struct Response<T> {
-    data: T,
-    error: bool,
-    message: *mut c_char,
-}
-
-#[repr(C)]
-pub struct WaveData {
-    frequency: f32,
-    amplitude: f32,
-}
-
-#[repr(C)]
-pub struct Array<T> {
-    ptr: *mut T,
-    length: usize,
-}
-
-impl<T> Response<T> {
-    fn ok(data: T) -> Response<T> {
-        Response {
-            data,
-            error: false,
-            message: CString::new("").unwrap().into_raw(),
-        }
-    }
-
-    fn error(data: T, message: String) -> Response<T> {
-        Response {
-            data,
-            error: true,
-            message: CString::new(message).unwrap().into_raw(),
-        }
-    }
-}
-
-impl<T> Array<T> {
-    fn get_mutable_array(&mut self) -> &mut [T] {
-        return unsafe { std::slice::from_raw_parts_mut(self.ptr, self.length) };
-    }
-    fn get_array(&self) -> &[T] {
-        return unsafe { std::slice::from_raw_parts(self.ptr, self.length) };
-    }
-}
+use crate::structs::array::Array;
+use crate::structs::response::Response;
+use crate::structs::wave_data::WaveData;
 
 #[no_mangle]
 pub extern "C" fn merge_audio_buffers(

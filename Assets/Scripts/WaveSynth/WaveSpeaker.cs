@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using WaveSynth.FrequencyHandlers;
 using WaveSynth.NativePluginHandler;
 
 namespace WaveSynth
@@ -28,7 +29,7 @@ namespace WaveSynth
             {
                 NativeWaveSynth.WaveData data = new NativeWaveSynth.WaveData()
                 {
-                    frequency = 523.25f,
+                    frequency = FrequencyTable.GetEqualTemperedFrequency(KeyboardKey.C, 5),
                     amplitude = 1
                 };
 
