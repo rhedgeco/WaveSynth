@@ -2,6 +2,7 @@
 using UnityEngine;
 using WaveSynth.Exceptions;
 using WaveSynth.Extensions;
+using WaveSynth.NativePluginHandler;
 
 namespace WaveSynth
 {
