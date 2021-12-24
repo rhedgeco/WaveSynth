@@ -54,8 +54,8 @@ pub extern "C" fn generate_sin_wave(
         let phase_advance = wave_data[wdi].frequency / sample_rate as f32;
         phase = (phase + phase_advance) % (2f32 * PI);
 
-        buffer[i + 0] = phase.sin() as f32 * wave_data[wdi].amplitude;
-        buffer[i + 1] = phase.sin() as f32 * wave_data[wdi].amplitude;
+        let val = phase.sin() as f32 * wave_data[wdi].amplitude;
+        for bi in 0..num_channels as usize { buffer[i + bi] = val }
     }
 
     return Response::ok(phase);

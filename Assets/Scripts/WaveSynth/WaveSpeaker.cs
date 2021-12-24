@@ -25,16 +25,15 @@ namespace WaveSynth
         {
             _audioBuffer = new float[WaveSettings.BufferSize];
             _defaultWaveData = new NativeWaveSynth.WaveData[WaveSettings.ChannelBufferSize];
-            for (int i = 0; i < _defaultWaveData.Length; i += 2)
+            for (int i = 0; i < _defaultWaveData.Length; i++)
             {
-                NativeWaveSynth.WaveData data = new NativeWaveSynth.WaveData()
+                NativeWaveSynth.WaveData data = new NativeWaveSynth.WaveData
                 {
-                    frequency = FrequencyTable.GetEqualTemperedFrequency(KeyboardKey.C, 5),
+                    frequency = FrequencyTable.GetEqualTemperedFrequency(KeyboardKey.C, 7),
                     amplitude = 1
                 };
 
-                _defaultWaveData[i + 0] = data;
-                _defaultWaveData[i + 1] = data;
+                _defaultWaveData[i] = data;
             }
 
             _buffersCreated = true;
