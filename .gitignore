@@ -16,3 +16,6 @@
 !/Packages/
 !/ReadmeResources/
 !/RustWorkspace/
+
+# exclude native plugins folder
+/Assets/Plugins
