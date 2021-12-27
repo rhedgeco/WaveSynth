@@ -1,7 +1,5 @@
 using System;
 using System.Runtime.InteropServices;
-using org.mariuszgromada.math.mxparser.parsertokens;
-using UnityEngine;
 
 namespace WaveSynth.NativePluginHandler
 {
