@@ -1,13 +1,14 @@
 using System;
 using System.Runtime.InteropServices;
+using org.mariuszgromada.math.mxparser.parsertokens;
 using UnityEngine;
 
 namespace WaveSynth.NativePluginHandler
 {
-    public class NativeWaveSynth
+    public static class NativeWaveSynth
     {
         private static NativePlugin _plugin = new NativePlugin("native_wave_synth");
-        
+
         [StructLayout(LayoutKind.Sequential)]
         public struct WaveData
         {
@@ -45,6 +46,11 @@ namespace WaveSynth.NativePluginHandler
             Array<float> buffer, Array<WaveData> waveData,
             float phaseStart, int numChannels, int sampleRate);
 
+        private static GenerateCacheWaveNative _generateCacheWave;
+        private delegate Response<float> GenerateCacheWaveNative(
+            Array<float> buffer, Array<WaveData> waveData, Array<float> cache,
+        float phaseStart, int numChannels, int sampleRate);
+
         public static void MergeAudioBuffers(float[] mainBuffer, float[] addBuffer)
         {
             EnsurePluginLoaded();
@@ -62,12 +68,24 @@ namespace WaveSynth.NativePluginHandler
             Array<WaveData> wd = new Array<WaveData>(waveData);
             return Process(_generateSinWave(b, wd, phaseStart, numChannels, sampleRate));
         }
+        
+        public static float GenerateCacheWave(
+            float[] buffer, WaveData[] waveData, float[] cache,
+            float phaseStart, int numChannels, int sampleRate)
+        {
+            EnsurePluginLoaded();
+            Array<float> b = new Array<float>(buffer);
+            Array<WaveData> wd = new Array<WaveData>(waveData);
+            Array<float> c = new Array<float>(cache);
+            return Process(_generateCacheWave(b, wd, c, phaseStart, numChannels, sampleRate));
+        }
 
         public static void LoadPlugin()
         {
             _plugin.LoadPlugin();
             _mergeAudioBuffers = _plugin.ExtractFunction<MergeAudioBuffersNative>("merge_audio_buffers");
             _generateSinWave = _plugin.ExtractFunction<GenerateSinWaveNative>("generate_sin_wave");
+            _generateCacheWave = _plugin.ExtractFunction<GenerateCacheWaveNative>("generate_cache_wave");
         }
 
         public static void UnloadPlugin()

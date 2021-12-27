@@ -67,7 +67,7 @@ namespace WaveSynth.Editor
                 float offset = rect.width / buffer.Length;
                 for (int l = 0; l < buffer.Length; l += 2)
                 {
-                    GL.Vertex3(l * offset, baseYL + buffer[l] * amp, 0);
+                    GL.Vertex3(l * offset, baseYL - buffer[l] * amp, 0);
                 }
                 GL.End();
                 
@@ -75,7 +75,7 @@ namespace WaveSynth.Editor
                 GL.Color(Color.green);
                 for (int r = 0; r < buffer.Length; r += 2)
                 {
-                    GL.Vertex3(r * offset, baseYR + buffer[r] * amp, 0);
+                    GL.Vertex3(r * offset, baseYR - buffer[r] * amp, 0);
                 }
                 GL.End();
 

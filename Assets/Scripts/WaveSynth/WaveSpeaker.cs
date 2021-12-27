@@ -10,14 +10,15 @@ namespace WaveSynth
         private bool _buffersCreated;
         private float[] _audioBuffer;
         private NativeWaveSynth.WaveData[] _defaultWaveData;
+        private float[] _cache;
 
         public float[] AudioBuffer => _audioBuffer;
 
         public float[] ProcessChain()
         {
             if (!_buffersCreated) CreateBuffers();
-            _lastPhase = NativeWaveSynth.GenerateSinWave(_audioBuffer, _defaultWaveData,
-                _lastPhase, WaveSettings.Channels, WaveSettings.SampleRate);
+            _lastPhase = NativeWaveSynth.GenerateCacheWave(_audioBuffer, _defaultWaveData,
+                _cache, _lastPhase, WaveSettings.Channels, WaveSettings.SampleRate);
             return _audioBuffer;
         }
 
