@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using WaveSynth.Exceptions;
-using WaveSynth.Extensions;
 using WaveSynth.NativePluginHandler;
 
 namespace WaveSynth
@@ -23,6 +22,7 @@ namespace WaveSynth
 
         private void Awake()
         {
+            NativeWaveSynth.LoadPlugin();
             AccessID = 0;
             AudioSettings.GetDSPBufferSize(out _bufferSize, out _numBuffer);
             _sampleRate = AudioSettings.GetConfiguration().sampleRate;
@@ -32,6 +32,11 @@ namespace WaveSynth
             _source.spatialBlend = 0;
             _source.reverbZoneMix = 0;
             _source.Play();
+        }
+
+        private void OnDestroy()
+        {
+            NativeWaveSynth.UnloadPlugin();
         }
 
         private void OnAudioFilterRead(float[] data, int channels)

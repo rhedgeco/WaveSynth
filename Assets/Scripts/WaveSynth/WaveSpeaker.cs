@@ -29,7 +29,7 @@ namespace WaveSynth
             {
                 NativeWaveSynth.WaveData data = new NativeWaveSynth.WaveData
                 {
-                    frequency = FrequencyTable.GetEqualTemperedFrequency(KeyboardKey.C, 7),
+                    frequency = FrequencyTable.GetEqualTemperedFrequency(KeyboardKey.C, 6),
                     amplitude = 1
                 };
 

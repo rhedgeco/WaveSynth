@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using WaveSynth.Exceptions;
 
 namespace WaveSynth.Editor
 {
@@ -11,14 +12,26 @@ namespace WaveSynth.Editor
 
         private void OnEnable()
         {
+            EditorApplication.update += Repaint;
             speaker = target as WaveSpeaker;
             material = new Material(Shader.Find("Hidden/Internal-Colored"));
+        }
+
+        private void OnDisable()
+        {
+            EditorApplication.update -= Repaint;
         }
 
         public override void OnInspectorGUI()
         {
             float[] buffer = speaker.AudioBuffer;
             if (buffer == null) return;
+            GUILayout.Label($"Wave scope is the size of the buffer.");
+            try
+            {
+                GUILayout.Label($"Channel buffer size: {WaveSettings.ChannelBufferSize}");
+            }
+            catch (WaveSettingsNotCreated) { /* do nothing */ }
 
             Rect rect = GUILayoutUtility.GetRect(10, 10000, 200, 200);
             if (Event.current.type == EventType.Repaint)
@@ -37,23 +50,33 @@ namespace WaveSynth.Editor
                 GL.Vertex3(0, rect.height, 0);
                 GL.End();
 
+                float amp = rect.height / 4;
+                float baseYL = rect.height / 4;
+                float baseYR = baseYL * 3;
+
                 GL.Begin(GL.LINES);
-
-                float amp = rect.height / 2;
-                float baseY = rect.height / 2;
-                
                 GL.Color(Color.grey);
-                GL.Vertex3(0,baseY,0);
-                GL.Vertex3(rect.width, baseY, 0);
-
+                GL.Vertex3(0, baseYL, 0);
+                GL.Vertex3(rect.width, baseYL, 0);
+                GL.Vertex3(0, baseYR, 0);
+                GL.Vertex3(rect.width, baseYR, 0);
+                GL.End();
+                
+                GL.Begin(GL.LINE_STRIP);
                 GL.Color(Color.green);
                 float offset = rect.width / buffer.Length;
-                for (int i = 0; i < buffer.Length - 4; i+=2)
+                for (int l = 0; l < buffer.Length; l += 2)
                 {
-                    GL.Vertex3(i * offset, baseY + buffer[i + 0] * amp, 0);
-                    GL.Vertex3(i * offset, baseY + buffer[i + 2] * amp, 0);
+                    GL.Vertex3(l * offset, baseYL + buffer[l] * amp, 0);
                 }
+                GL.End();
                 
+                GL.Begin(GL.LINE_STRIP);
+                GL.Color(Color.green);
+                for (int r = 0; r < buffer.Length; r += 2)
+                {
+                    GL.Vertex3(r * offset, baseYR + buffer[r] * amp, 0);
+                }
                 GL.End();
 
                 GL.PopMatrix();
