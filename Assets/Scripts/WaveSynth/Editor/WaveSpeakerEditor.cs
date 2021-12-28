@@ -24,6 +24,7 @@ namespace WaveSynth.Editor
 
         public override void OnInspectorGUI()
         {
+            base.OnInspectorGUI();
             float[] buffer = speaker.AudioBuffer;
             if (buffer == null) return;
             GUILayout.Label($"Wave scope is the size of the buffer.");

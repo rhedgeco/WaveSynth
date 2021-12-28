@@ -11,7 +11,7 @@ namespace WaveSynth.NativePluginHandler
         public struct WaveData
         {
             public float frequency;
-            public float amplitude;
+            public float velocity;
         }
 
         [StructLayout(LayoutKind.Sequential)]

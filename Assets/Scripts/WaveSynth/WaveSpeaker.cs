@@ -1,42 +1,28 @@
 ﻿using UnityEngine;
-using WaveSynth.FrequencyHandlers;
-using WaveSynth.NativePluginHandler;
+using WaveSynth.WaveOutputs.WaveGenerators;
 
 namespace WaveSynth
 {
     public class WaveSpeaker : MonoBehaviour
     {
+        [SerializeField] private WaveGenerator generator;
+        
         private float _lastPhase;
         private bool _buffersCreated;
         private float[] _audioBuffer;
-        private NativeWaveSynth.WaveData[] _defaultWaveData;
-        private float[] _cache;
 
         public float[] AudioBuffer => _audioBuffer;
 
         public float[] ProcessChain()
         {
             if (!_buffersCreated) CreateBuffers();
-            _lastPhase = NativeWaveSynth.GenerateCacheWave(_audioBuffer, _defaultWaveData,
-                _cache, _lastPhase, WaveSettings.Channels, WaveSettings.SampleRate);
+            if (generator != null) generator.ProcessBuffer(ref _audioBuffer);
             return _audioBuffer;
         }
 
         private void CreateBuffers()
         {
             _audioBuffer = new float[WaveSettings.BufferSize];
-            _defaultWaveData = new NativeWaveSynth.WaveData[WaveSettings.ChannelBufferSize];
-            for (int i = 0; i < _defaultWaveData.Length; i++)
-            {
-                NativeWaveSynth.WaveData data = new NativeWaveSynth.WaveData
-                {
-                    frequency = FrequencyTable.GetEqualTemperedFrequency(KeyboardKey.C, 6),
-                    amplitude = 1
-                };
-
-                _defaultWaveData[i] = data;
-            }
-
             _buffersCreated = true;
         }
 
